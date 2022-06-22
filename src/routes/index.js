@@ -16,7 +16,13 @@ const upload = multer({ storage });
 const api =  new Api();
 
 router.get("/productos", (req, res, next) => {
+  try{
   res.json(api.getProducts());
+} catch(error){
+  res
+   .status(error.statusCode ? error.statusCode : 500)
+   .json({ error: error.message });
+ }
 });
 
 router.get("/productos/:id", (req, res, next) => {
@@ -32,10 +38,16 @@ router.get("/productos/:id", (req, res, next) => {
 });
 
 router.post("/productos", upload.single("thumbnail"), (req, res, next) => {
+  try{
   const { name, price } = req.body;
   const thumbnail = req.file;
   api.postProduct(name, price, thumbnail);
   res.sendStatus(201);
+  } catch (error) {
+    res
+    .status(error.statusCode ? error.statusCode : 500)
+    .json({ error: error.message });
+  }
 });
 
 router.put("/productos/:id", (req, res, next) => {
